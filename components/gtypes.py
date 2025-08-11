@@ -42,3 +42,42 @@ def embedded_gtype(keyword: str) -> str:
         "signed": SIGNED,
         "*": POINTER
     } [keyword]
+
+class VariableTypeCreator:
+    def __init__(self) -> None:
+        self.typecat = []
+        self.TYPES_CANNOT_MERGE = 1
+        self.FAILED = 0
+        self.SUCSESS = 2
+
+    def set_allocation_type(self, constant_alloc: bool) -> int:
+        if constant_alloc == True:
+            self.typecat.append("constant")
+        else:
+            self.typecat.append("variable")
+        return self.SUCSESS
+
+    def set_type_specifier(self, type_constant: str) -> int:
+        mtyc = 0
+        for i in self.typecat:
+            if i in [INT64, BOOL64, FLOAT64, CHARASCII, CHARUNICODE]:
+                mtyc += 1
+        if mtyc > 1:
+            return self.TYPES_CANNOT_MERGE
+        mtyc = 0
+        for i in self.typecat:
+            if i in [STATIC, VOLITILE]:
+                mtyc += 1
+        if mtyc > 1:
+            return self.TYPES_CANNOT_MERGE
+        mtyc = 0
+        for i in self.typecat:
+            if i in [UNSIGNED, SIGNED]:
+                mtyc += 1
+        if mtyc > 1:
+            return self.TYPES_CANNOT_MERGE
+
+        self.typecat.append(type_constant)
+
+    def lock_and_return_type(self) -> list:
+        return self.typecat
