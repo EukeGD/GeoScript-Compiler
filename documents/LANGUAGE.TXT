@@ -24,6 +24,9 @@ continue
 break
 
 
+while ([pointer] [comparitor] [pointer2]) {}
+
+
 class [name](optional_classes) {}
 
 nonlocal [ident]

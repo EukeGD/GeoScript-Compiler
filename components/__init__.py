@@ -16,3 +16,5 @@
 import memmanager
 import gtypes
 import lexer_modules
+import comparitives
+import gsmath
