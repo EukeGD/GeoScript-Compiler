@@ -15,3 +15,4 @@
 
 import memmanager
 import gtypes
+import lexer_modules

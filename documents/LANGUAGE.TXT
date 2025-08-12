@@ -1,0 +1,64 @@
+Language Keywords
+===================
+const [ident]: [typechain] = [value]
+
+let [ident]: [typechain] = [value]
+
+
+function [name]([id_type_chain]) {}
+
+return [value]
+
+
+if ([ident] [comparitor] [ident2]) {}
+
+} else if ([ident] [comparitor] [ident2]) {}
+
+} else {}
+
+
+for ([typechain] [name], [name] [comparitor] [value], [name] [math_statement]) {}
+
+continue
+
+break
+
+
+class [name](optional_classes) {}
+
+nonlocal [ident]
+
+global [ident]
+
+
+defasync [name]
+
+await [name]
+
+
+Data Tags
+==================
+@ips: [int_val]
+
+@maxgroups: [int_val]
+
+@minversion: [gdversion]
+
+@maxversion: [gdversion]
+
+
+Header Tags
+==================
+#include <[module.gsh]>
+
+#define [name] [string_val]
+
+#ifdef [name]
+
+#ifndef [name]
+
+#endif [name]
+
+#if [name]
+
+#else [name]
