@@ -13,9 +13,9 @@
 #
 # ------------------------------------------------
 
-import memmanager
-import gtypes
-import lexer_modules
-import comparitives
-import gsmath
-import error_handler
+from . import memmanager
+from . import gtypes
+from . import lexer_modules
+from . import comparitives
+from . import gsmath
+from . import error_handler

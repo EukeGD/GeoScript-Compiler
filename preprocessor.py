@@ -15,7 +15,8 @@
 
 import gddata as gdata
 from components import error_handler
-import json5
+import json
+import sys
 
 class InvalidDataTagKeyword(error_handler.ErrorType): ...
 class InvalidPreprocessorKeyword(error_handler.ErrorType): ...
@@ -83,13 +84,13 @@ class ParseForSingleFile:
                     line = line.split(' ')
                     self.preprocessor_data['macro'][line[0]] = line[1]
                 else:
-                    self.preprocessor_data['macro'][line[0]] = None
+                    self.preprocessor_data['macro'][line] = None
             elif line.startswith('#ifdef ') == True:
                 line = line.removeprefix('#ifdef ')
                 self.preprocessor_data['controll-flow']['start'].append({'start': ln, 'macro': line, 'expected': '§GSDEFINED'})
             elif line.startswith('#ifndef ') == True:
                 line = line.removeprefix('#ifndef ')
-                self.preprocessor_data['controll-flow']['start'].append({'start': ln, 'macro': line, 'expected': '§GSDEFINED'})
+                self.preprocessor_data['controll-flow']['start'].append({'start': ln, 'macro': line, 'expected': '§GSUNDEFINED'})
             elif line.startswith('#if ') == True:
                 line = line.removeprefix('#if ')
                 line = line.split(' ')
@@ -101,6 +102,7 @@ class ParseForSingleFile:
 
 def main(file: str) -> None:
     with open(file) as rstream:
+        sublines = -1
         gddata = gdata.readJSONData()
         usedfiles = [file]
         stringstream = rstream.read()
@@ -129,15 +131,43 @@ def main(file: str) -> None:
             break
         
         parsedfile = ParseForSingleFile(file, stringstream)
-        for macro in parsedfile.preprocessor_data['macros']:
-            if not parsedfile.preprocessor_data['macros'][macro] == None:
-                stringstream.replace(macro, parsedfile.preprocessor_data['macros'][macro])
+        for macro in parsedfile.preprocessor_data['macro']:
+            if not parsedfile.preprocessor_data['macro'][macro] == None:
+                stringstream = stringstream.replace(macro, parsedfile.preprocessor_data['macro'][macro])
         
+        for num, ctrlflow in enumerate(parsedfile.preprocessor_data['controll-flow']['start']):
+            if ctrlflow['expected'] == '§GSDEFINED':
+                if not parsedfile.preprocessor_data['macro'].get(ctrlflow['macro']) == None:
+                    rmlines = stringstream.splitlines()
+                    for i in range(ctrlflow['start'], parsedfile.preprocessor_data['controll-flow']['end'][num]):
+                        rmlines.pop(i-(i-ctrlflow['start'])-sublines)
+                        sublines += 1
+                    stringstream = '\n'.join(rmlines)
+            elif ctrlflow['expected'] == '§GSUNDEFINED':
+                if parsedfile.preprocessor_data['macro'].get(ctrlflow['macro']) == None:
+                    rmlines = stringstream.splitlines()
+                    for i in range(ctrlflow['start'], parsedfile.preprocessor_data['controll-flow']['end'][num], 1):
+                        rmlines.pop(i-(i-ctrlflow['start'])-sublines)
+                        sublines += 1
+                    stringstream = '\n'.join(rmlines)
+            else:
+                if not parsedfile.preprocessor_data['macro'].get(ctrlflow['macro']) == ctrlflow['expected']:
+                    rmlines = stringstream.splitlines()
+                    for i in range(ctrlflow['start'], parsedfile.preprocessor_data['controll-flow']['end'][num]):
+                        rmlines.pop(i-(i-ctrlflow['start'])-sublines)
+                        sublines += 1
+                    stringstream = '\n'.join(rmlines)
         
         with open('datatags.json', 'w') as wstrm:
-            json5.dump(parsedfile.datatags, wstrm)
+            json.dump(parsedfile.datatags, wstrm)
         
         with open('preprocessed.gsi', 'w') as wstrm:
             wstrm.write(stringstream)
         
         exit(0)
+
+if __name__ == '__main__':
+    if len(sys.argv) == 1:
+        print('No file to parse')
+        exit(1)
+    main(sys.argv[1])
