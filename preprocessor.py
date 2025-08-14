@@ -164,10 +164,10 @@ def main(file: str) -> None:
         with open('preprocessed.gsi', 'w') as wstrm:
             wstrm.write(stringstream)
         
-        exit(0)
+        sys.exit(0)
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
         print('No file to parse')
-        exit(1)
+        sys.exit(1)
     main(sys.argv[1])
